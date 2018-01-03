@@ -151,28 +151,24 @@
         #loginOSBg .item .closeEye {
             background: url('./images/OS-icon.png') no-repeat -73px -209px;
         }
+
         /*icon end*/
 
         /*不合法提示 start*/
-        .unMeetTip {
+        #loginOSBg .item .unMeetTip {
             position: absolute;
             bottom: 8px;
             left: 40px;
             color: indianred;
         }
 
-        /*表单无效样式*/
-        input:required:invalid {
-        }
-
-        .TipUser {
+        #loginOSBg .item .TipUser {
             display: none;
         }
 
-        .TipPass {
+        #loginOSBg .item .TipPass {
             display: none;
         }
-
         /*不合法提示 end*/
     </style>
 </head>
@@ -180,12 +176,15 @@
 <section id="loginOSBg">
     <div class="loginBoard">
         <h3>Banggood OS</h3>
-        <form class="loginOSForm" action="http://baidu.com" method="post">
+        <form class="loginOSForm" action="https://myosbeta.banggood.com/index.php" method="post">
+            <!--抽离出接口地址中跟的参数，隐藏提交-->
+            <input type="hidden" name="com" value="login">
+            <input type="hidden" name="t" value="login_special">
+            <input type="hidden" name="zmkm" value="1">
             <div class="item">
                 <span class="icon iconUsername"></span>
                 <b class="line"></b>
-                <input type="text" id="username" class="input" placeholder="Username" maxlength="50" required
-                       oninvalid="setCustomValidity('请输入您的姓名');" oninput="setCustomValidity('');">
+                <input type="text" id="username" class="input" name="username" placeholder="Username" maxlength="50" required>
                 <!--不合法提示-->
                 <i class="unMeetTip TipUser">
                     * 请输入50个以内字符，由数字、字母组成
@@ -194,7 +193,7 @@
             <div class="item">
                 <span class="icon iconPassword"></span>
                 <b class="line"></b>
-                <input type="password" id="password" class="input" placeholder="Enter password" maxlength="20" required>
+                <input type="password" id="password" class="input" name="password" placeholder="Enter password" maxlength="20" required>
                 <span class="icon iconEye closeEye"></span>
                 <!--不合法提示-->
                 <i class="unMeetTip TipPass">
@@ -210,76 +209,97 @@
 </body>
 
 <script>
-    var $, $All, checkFn, inputOArr, loginOSFormO, TipUserO, TipPassO, submitO, val, patten, isMeet, passwordO, passType, usernameO, userValIsMeet, passValIsMeet
-    /*
-     * 功能: 选择器封装
-     * 参数: css选择器
-     * querySelector: 返回匹配指定选择器的第一个元素,querySelectorAll返回所有的元素。
-     *
-     * */
-    $ = function (param) {
-        return document.querySelector(param)
-    }
-    $All = function (param) {
-        return document.querySelectorAll(param)
-    }
-    loginOSFormO = $('.loginOSForm')
-    usernameO = $('#username');
-    passwordO = $('#password');
-    inputOArr = $All('.input')
-    TipUserO = $('.TipUser')
-    TipPassO = $('.TipPass')
-    submitO = $('#submit')
-    patten = /^\w+$/ //数字、字母、下划线
+    (function () {
+        var loginOS = {
+            init: function () {
+                var $, $All, checkFn, inputOArr, loginOSFormO, TipUserO, TipPassO, submitO, val, pattenPass,pattenUser, passwordO, passType, usernameO, userValIsMeet, passValIsMeet
+                /*
+                 * 功能: 选择器封装
+                 * 参数: css选择器
+                 * querySelector: 返回匹配指定选择器的第一个元素,querySelectorAll返回所有的元素。
+                 *
+                 * */
+                $ = function (param) {
+                    return document.querySelector(param)
+                }
+                $All = function (param) {
+                    return document.querySelectorAll(param)
+                }
 
-    /*切换密码的隐藏和显示*/
-    $('.iconEye').onclick = function () {
-        var self = this
-        passType = passwordO.getAttribute("type")
-        if (passType && passType == "password") {
-            passwordO.setAttribute("type", "text")
-            self.style.cssText = "background: url('./images/OS-icon.png') no-repeat -46px -209px;"
-        } else {
-            passwordO.setAttribute("type", "password")
-            self.style.cssText = "background: url('./images/OS-icon.png') no-repeat -73px -209px;"
-        }
-    }
+                /*缓存DOM*/
+                loginOSFormO = $('.loginOSForm')
+                usernameO = $('#username');
+                passwordO = $('#password');
+                inputOArr = $All('.input')
+                TipUserO = $('.TipUser')
+                TipPassO = $('.TipPass')
+                submitO = $('#submit')
 
-    /*正则校验-失去焦点+提交*/
-    for (let i = 0, len = inputOArr.length; i < len; ++i) {
-        inputOArr[i].onblur = function () {
-            val = this.value
-            isMeet = patten.test(val)
+                /*正则*/
+                pattenUser = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/ //验证用户名-邮箱
+                pattenPass = /^\w+$/ //验证密码-数字、字母、下划线
 
-            if (this == inputOArr[0] && !isMeet) {
-                TipUserO.style.cssText = "display:inline-block"
+                /*切换密码的隐藏和显示*/
+                $('.iconEye').onclick = function () {
+                    var self = this
+                    passType = passwordO.getAttribute("type")
+                    if (passType && passType == "password") {
+                        passwordO.setAttribute("type", "text")
+                        self.style.cssText = "background: url('./images/OS-icon.png') no-repeat -46px -209px;"
+                    } else {
+                        passwordO.setAttribute("type", "password")
+                        self.style.cssText = "background: url('./images/OS-icon.png') no-repeat -73px -209px;"
+                    }
+                }
 
-            } else if (this == inputOArr[0] && isMeet) {
-                TipUserO.style.cssText = "display:none"
+                /*正则校验-失去焦点+提交*/
+                for (let i = 0, len = inputOArr.length; i < len; ++i) {
+                    inputOArr[i].onblur = function () {
+                        val = this.value
+
+                        if (this == inputOArr[0]){
+                            if(! pattenUser.test(val)){
+
+                                TipUserO.style.cssText = "display:inline-block"
+                            }else{
+                                TipUserO.style.cssText = "display:none"
+                            }
+
+                        }else if (this == inputOArr[1]){
+                            if(! pattenPass.test(val)){
+
+                                TipPassO.style.cssText = "display:inline-block"
+                            }else{
+                                TipPassO.style.cssText = "display:none"
+                            }
+
+                        }
+                    }
+                }
+
+
+                /*校验不通过禁止提交*/
+                loginOSFormO.onsubmit = function () {
+                    return checkFn()
+                }
+                checkFn = function () {
+                    console.log("您的表单先验证再决定是否提交！");
+                    userValIsMeet = pattenUser.test(usernameO.value)
+                    passValIsMeet = pattenPass.test(passwordO.value)
+
+                    if (!userValIsMeet || !passValIsMeet) {
+                        alert("请正确填写您的信息！")
+                        return false
+                    }
+                }
+
             }
-            if (this == inputOArr[1] && !isMeet) {
-                TipPassO.style.cssText = "display:inline-block"
-            } else if (this == inputOArr[1] && isMeet) {
-                TipPassO.style.cssText = "display:none"
-            }
+        };
+        window.onload = function () {
+            loginOS.init();
         }
-    }
+    })();
 
-
-    /*校验不通过禁止提交*/
-    loginOSFormO.onsubmit = function () {
-        return checkFn()
-    }
-    checkFn = function () {
-        console.log("您的表单先验证再决定是否提交！");
-        userValIsMeet = patten.test(usernameO.value)
-        passValIsMeet = patten.test(passwordO.value)
-
-        if (!userValIsMeet || !passValIsMeet) {
-            alert("请正确填写您的信息！")
-            return false
-        }
-    }
 
 </script>
 </html>
