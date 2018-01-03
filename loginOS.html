@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>loginOS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+
+        }
+
+        b, u, i {
+            font-style: normal;
+            font-size: 12px;
+        }
+
+        #loginOSBg {
+            width: 100%;
+            height: 100%;
+            background: #F4F4F4;
+            padding-top: 123px;
+        }
+
+        #loginOSBg .loginBoard {
+            width: 580px;
+            height: 580px;
+            background: #fff;
+            box-shadow: 4px 6px 10px 2px #ccc;
+            border-radius: 10px;
+            margin: 0 auto;
+            padding: 80px 90px 0px;
+            text-align: center;
+        }
+
+        #loginOSBg h3 {
+            height: 110px;
+            font-size: 30px;
+            color: #383838;
+        }
+
+        #loginOSBg #submit {
+            width: 400px;
+            height: 50px;
+            background: #0078D7;
+            border-radius: 0;
+            font-family: Arial;
+            font-size: 18px;
+            margin-top: 18px;
+        }
+
+        #loginOSBg .item input {
+            width: 400px;
+            height: 50px;
+            border: 1px solid #DDDDDD;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 16px;
+            padding-left: 58px;
+
+        }
+
+        #loginOSBg .item input:focus {
+            outline: none
+        }
+
+        #loginOSBg .item #username {
+            margin-bottom: 32px;
+        }
+
+        #loginOSBg .item #password {
+            margin-bottom: 40px;
+        }
+
+        #loginOSBg .item #submit {
+            background: #0078D7;
+            border-radius: 0;
+            font-family: Arial;
+            font-size: 18px;
+            color: #fff;
+            padding: 0;
+        }
+
+        #loginOSBg input::placeholder {
+            color: #DDDDDD;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        /*placeholder兼容处理*/
+        #loginOSBg input::-webkit-input-placeholder {
+            color: #DDDDDD;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        #loginOSBg input:-ms-input-placeholder {
+            color: #DDDDDD;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        /*icon start*/
+        #loginOSBg .item {
+            position: relative;
+        }
+
+        #loginOSBg .item .icon {
+            position: absolute;
+            left: 16px;
+            top: 15px;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+        }
+
+        #loginOSBg .item .iconUsername {
+            background: url('./images/OS-icon.png') no-repeat -103px -211px;
+        }
+
+        #loginOSBg .item .line {
+            display: inline-block;
+            width: 1px;
+            height: 18px;
+            position: absolute;
+            left: 46px;
+            top: 15px;
+            background: #DDD;
+        }
+
+        #loginOSBg .item .iconPassword {
+            height: 21px;
+            top: 12px;
+            background: url('./images/OS-icon.png') no-repeat -125px -208px;
+        }
+
+        #loginOSBg .item .iconEye {
+            width: 25px;
+            height: 21px;
+            left: 357px;
+            top: 17px;
+            cursor: pointer;
+        }
+
+        #loginOSBg .item .closeEye {
+            background: url('./images/OS-icon.png') no-repeat -73px -209px;
+        }
+        /*icon end*/
+
+        /*不合法提示 start*/
+        .unMeetTip {
+            position: absolute;
+            bottom: 8px;
+            left: 40px;
+            color: indianred;
+        }
+
+        /*表单无效样式*/
+        input:required:invalid {
+        }
+
+        .TipUser {
+            display: none;
+        }
+
+        .TipPass {
+            display: none;
+        }
+
+        /*不合法提示 end*/
+    </style>
+</head>
+<body>
+<section id="loginOSBg">
+    <div class="loginBoard">
+        <h3>Banggood OS</h3>
+        <form class="loginOSForm" action="http://baidu.com" method="post">
+            <div class="item">
+                <span class="icon iconUsername"></span>
+                <b class="line"></b>
+                <input type="text" id="username" class="input" placeholder="Username" maxlength="50" required
+                       oninvalid="setCustomValidity('请输入您的姓名');" oninput="setCustomValidity('');">
+                <!--不合法提示-->
+                <i class="unMeetTip TipUser">
+                    * 请输入50个以内字符，由数字、字母组成
+                </i>
+            </div>
+            <div class="item">
+                <span class="icon iconPassword"></span>
+                <b class="line"></b>
+                <input type="password" id="password" class="input" placeholder="Enter password" maxlength="20" required>
+                <span class="icon iconEye closeEye"></span>
+                <!--不合法提示-->
+                <i class="unMeetTip TipPass">
+                    * 请输入20个以内字符，由数字、字母组成
+                </i>
+            </div>
+            <div class="item">
+                <input type="submit" id="submit" value="Log in">
+            </div>
+        </form>
+    </div>
+</section>
+</body>
+
+<script>
+    var $, $All, checkFn, inputOArr, loginOSFormO, TipUserO, TipPassO, submitO, val, patten, isMeet, passwordO, passType, usernameO, userValIsMeet, passValIsMeet
+    /*
+     * 功能: 选择器封装
+     * 参数: css选择器
+     * querySelector: 返回匹配指定选择器的第一个元素,querySelectorAll返回所有的元素。
+     *
+     * */
+    $ = function (param) {
+        return document.querySelector(param)
+    }
+    $All = function (param) {
+        return document.querySelectorAll(param)
+    }
+    loginOSFormO = $('.loginOSForm')
+    usernameO = $('#username');
+    passwordO = $('#password');
+    inputOArr = $All('.input')
+    TipUserO = $('.TipUser')
+    TipPassO = $('.TipPass')
+    submitO = $('#submit')
+    patten = /^\w+$/ //数字、字母、下划线
+
+    /*切换密码的隐藏和显示*/
+    $('.iconEye').onclick = function () {
+        var self = this
+        passType = passwordO.getAttribute("type")
+        if (passType && passType == "password") {
+            passwordO.setAttribute("type", "text")
+            self.style.cssText = "background: url('./images/OS-icon.png') no-repeat -46px -209px;"
+        } else {
+            passwordO.setAttribute("type", "password")
+            self.style.cssText = "background: url('./images/OS-icon.png') no-repeat -73px -209px;"
+        }
+    }
+
+    /*正则校验-失去焦点+提交*/
+    for (let i = 0, len = inputOArr.length; i < len; ++i) {
+        inputOArr[i].onblur = function () {
+            val = this.value
+            isMeet = patten.test(val)
+
+            if (this == inputOArr[0] && !isMeet) {
+                TipUserO.style.cssText = "display:inline-block"
+
+            } else if (this == inputOArr[0] && isMeet) {
+                TipUserO.style.cssText = "display:none"
+            }
+            if (this == inputOArr[1] && !isMeet) {
+                TipPassO.style.cssText = "display:inline-block"
+            } else if (this == inputOArr[1] && isMeet) {
+                TipPassO.style.cssText = "display:none"
+            }
+        }
+    }
+
+
+    /*校验不通过禁止提交*/
+    loginOSFormO.onsubmit = function () {
+        return checkFn()
+    }
+    checkFn = function () {
+        console.log("您的表单先验证再决定是否提交！");
+        userValIsMeet = patten.test(usernameO.value)
+        passValIsMeet = patten.test(passwordO.value)
+
+        if (!userValIsMeet || !passValIsMeet) {
+            alert("请正确填写您的信息！")
+            return false
+        }
+    }
+
+</script>
+</html>
